@@ -1,0 +1,47 @@
+#минимальный размер файла для сжатия 100
+    gzip_min_length 100;
+#на сколько сильно сжимать файлы ,чем больше число тем больше производ требуется(опт от 2-4)
+    gzip_comp_level 3;
+#какой тип файлов сжимать
+    gzip_types text/plain;
+    gzip_types text/css;
+    gzip_types text/javascript;
+
+    root /var/www/html;
+    index index.php index.html index.htm index.nginx-debian.html;
+    location ~ /.well-known {
+      allow all;
+  }
+    
+    location =/greet {
+      return 200 'Hello';
+  }
+
+#folder /sites/downloads
+#if file exist variable  $uri, if doesn not 404 
+#logs for downloads location #add 'debug' to the en for more information
+#      error log /var/log/nginx/downloads.error.log; 
+#disable log 
+#      acsess_log off;
+#      error_log off; 
+    location /downloads {
+      root /sites;
+      try_files $uri =404;
+  }
+#cash one mounth for css
+    location ~* \.css {
+      access_log off;
+      expires 1m;
+      add_header Pragma public;
+      add_header Cache-Control public;
+      add_header Vary Accept-Encoding;
+  }
+  
+    location ~ \.php$ {
+      include snippets/fastcgi-php.conf;
+      fastcgi_cache microcache;
+      fastcgi_cache_valid 200 60m;
+      fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+   }
+  }
+}
